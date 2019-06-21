@@ -1,0 +1,6 @@
+/Dataset
+/image_files
+*.zip
+metadata.csv
+metadata1.csv
+.env
