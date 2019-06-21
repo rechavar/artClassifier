@@ -44,6 +44,7 @@ def prepareDataset(dataDir):
     pd.DataFrame(metadata1).to_csv('metadata1.csv', index=False)
 
 def saveCropImage(filePath, newName, exterior):
+    print(filePath)
     img = cv2.imread(filePath)
     img2 = img[int(exterior[0][1]):int(exterior[1][1]), int(exterior[0][0]):int(exterior[1][0])]
     cv2.imwrite(os.path.join('image_files', newName), img2)
