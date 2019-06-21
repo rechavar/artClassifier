@@ -165,4 +165,4 @@ if __name__ == '__main__':
     parser.add_argument('--dir', '-d', help="directory with images")
     
     args = parser.parse_args()
-    prepare_dataset(args.dir)
+    prepareDataset(args.dir)
