@@ -61,10 +61,10 @@ def splitDataset(ds_len):
 
 def buildSources(metadata, dataDir, mode='train', excludeLabels=None):
     
-    if exclude_labels is None:
-        exclude_labels = set()
-    if isinstance(exclude_labels, (list, tuple)):
-        exclude_labels = set(exclude_labels)
+    if excludeLabels is None:
+        excludeLabels = set()
+    if isinstance(excludeLabels, (list, tuple)):
+        excludeLabels = set(excludeLabels)
 
     df = metadata.copy()
     df = df[df['split'] == mode]
