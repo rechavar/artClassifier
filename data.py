@@ -32,7 +32,7 @@ def prepareDataset(dataDir):
                 print(ann)
 
             saveCropImage(os.path.join(annDir[:-4],'img',ann[:-5]), newFileName, i['points']['exterior'])
-    metadata['split'] = splitDataset(len(metadata['imageName']))
+    metadata['split'] = splitDataset(len(metadata['imageLabel']))
     metadata = pd.DataFrame(metadata)
     metadata.to_csv('metadata.csv', index=False)
     metadata1 = []
