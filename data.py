@@ -172,7 +172,3 @@ if __name__ == '__main__':
     args = parser.parse_args()
     prepare_dataset(args.dir)
     
-
-
-
-prepareDataset(r'C:\Users\USER\Desktop\Universidad\Grupo de estudio DeepLearning\ART_DATASET\Dataset')
