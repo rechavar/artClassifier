@@ -30,7 +30,7 @@ def prepareDataset(dataDir):
                 metadata['imageLabel'].append(i['tags'][0]['name'])
             except:
                 print(ann)
-
+                break
             saveCropImage(os.path.join(annDir[:-4],'img',ann[:-5]), newFileName, i['points']['exterior'])
     metadata['split'] = splitDataset(len(metadata['imageLabel']))
     metadata = pd.DataFrame(metadata)
