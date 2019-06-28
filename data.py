@@ -24,13 +24,13 @@ def prepareDataset(dataDir):
             dataStore = json.loads(f.read())
         for i in dataStore['objects']:
             newFileName = fn(ann)
-            metadata['imageName'].append(newFileName)
 
             try:
                 metadata['imageLabel'].append(i['tags'][0]['name'])
             except:
                 print(ann)
                 break
+            metadata['imageName'].append(newFileName)
             saveCropImage(os.path.join(annDir[:-4],'img',ann[:-5]), newFileName, i['points']['exterior'])
     metadata['split'] = splitDataset(len(metadata['imageLabel']))
     metadata = pd.DataFrame(metadata)
