@@ -8,7 +8,7 @@ from collections import defaultdict
 import cv2
 
 
-label = {'fotografia': 0, 'Escultura':1, 'Mural':2, 'pintura':3, 'dibujo':4}
+label = ['Escultura', 'Mural', 'fotografia', 'pintura', 'dibujo'] 
 
 def prepareDataset(dataDir):
     if not os.path.exists('image_files'):
@@ -35,8 +35,9 @@ def prepareDataset(dataDir):
     metadata = pd.DataFrame(metadata)
     metadata.to_csv('metadata.csv', index=False)
     metadata1 = []
-    for _, values in label.items():
+    for values in label.items():
         metadata1.append(metadata.query("split == 'train' & imageLabel == " + "'" + str(values)+"'").iloc[0])
+        
     pd.DataFrame(metadata1).to_csv('metadata1.csv', index = False)
 
 
