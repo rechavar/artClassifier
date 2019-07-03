@@ -6,8 +6,7 @@ import numpy as np
 import pandas as pd
 from collections import defaultdict
 import cv2
-import tensorflow as tf
-import tensorflow.io as io
+
 
 label = {'fotografia': 0, 'Escultura':1, 'Mural':2, 'pintura':3, 'dibujo':4}
 
@@ -37,7 +36,7 @@ def prepareDataset(dataDir):
     metadata.to_csv('metadata.csv', index=False)
     metadata1 = []
     for _, values in label.items():
-        metadata1.append(metadata.query("split == 'train' & label == " + str(values).iloc[0]))
+        metadata1.append(metadata.query("split == 'train' & imageLabel == " + "'" + str(values)+"'").iloc[0])
     pd.DataFrame(metadata1).to_csv('metadata1.csv', index = False)
 
 
@@ -112,7 +111,7 @@ def make_dataset(sources, training=False, batch_size=1,
     })
 
     if training:
-        ds = ds.shuffle(shuffle_buffer_size0)
+        ds = ds.shuffle(shuffle_buffer_size)
 
     ds = map(load,num_parallel_calls = num_parallel_calls)
     ds = map(lambda x,y: (preprocessImage(x,pixels), y))
@@ -168,7 +167,4 @@ if __name__ == '__main__':
     parser.add_argument('--dir', '-d',
         help="directory with images"
     )
-    
-    args = parser.parse_args()
-    prepare_dataset(args.dir)
     
