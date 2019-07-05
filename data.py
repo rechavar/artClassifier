@@ -9,6 +9,7 @@ from collections import defaultdict
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+import matplotlib.pyplot as plt
 
 labels = ['Escultura', 'Mural', 'fotografia', 'pintura', 'dibujo'] 
 
