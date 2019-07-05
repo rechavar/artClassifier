@@ -68,8 +68,8 @@ def buildSources(metadata, dataDir, mode='train', excludeLabels=None):
 
     df = metadata.copy()
     df = df[df['split'] == mode]
-    df['filepath'] = df['image_name'].apply(lambda x: os.path.join(dataDir, x))
-    include_mask = df['label'].apply(lambda x: x not in exclude_labels)
+    df['filepath'] = df['imageName'].apply(lambda x: os.path.join(dataDir, x))
+    include_mask = df['imageLabel'].apply(lambda x: x not in exclude_labels)
     df = df[include_mask]
 
     sources = list(zip(df['filepath'], df['label']))
