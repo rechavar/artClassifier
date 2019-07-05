@@ -34,6 +34,7 @@ def prepareDataset(dataDir):
     metadata['split'] = splitDataset(len(metadata['imageLabel']))
     metadataPd = pd.DataFrame(metadata)
     metadata1 = []
+    
     for values in label.items():
         metadata1.append(metadataPd.query("split == 'train' & imageLabel == " + "'" + str(values)+"'").iloc[0])
         
