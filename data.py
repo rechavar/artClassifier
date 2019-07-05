@@ -8,6 +8,7 @@ import cv2
 from collections import defaultdict
 import numpy as np
 import pandas as pd
+import tensorflow as tf
 
 labels = ['Escultura', 'Mural', 'fotografia', 'pintura', 'dibujo'] 
 
@@ -118,10 +119,10 @@ def makeDataset(sources, training=False, batch_size=1,
         ds = ds.shuffle(shuffle_buffer_size)
     
     ds = ds.map(load, num_parallel_calls=num_parallel_calls)
-    ds = ds.map(lambda x,y: (preprocess_image(x, pixels), y))
+    ds = ds.map(lambda x,y: (preprocessImage(x, pixels), y))
     
     if training:
-        ds = ds.map(lambda x,y: (augment_image(x), y))
+        ds = ds.map(lambda x,y: (augmentImage(x), y))
         
     ds = ds.repeat(count=num_epochs)
     ds = ds.batch(batch_size=batch_size)
