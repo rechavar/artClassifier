@@ -69,10 +69,10 @@ def buildSources(metadata, dataDir, mode='train', excludeLabels=None):
     df = metadata.copy()
     df = df[df['split'] == mode]
     df['filepath'] = df['imageName'].apply(lambda x: os.path.join(dataDir, x))
-    include_mask = df['imageLabel'].apply(lambda x: x not in exclude_labels)
-    df = df[include_mask]
-
-    sources = list(zip(df['filepath'], df['label']))
+    includeMask = df['imageLabel'].apply(lambda x: x not in excludeLabels)
+    df = df[includeMask]
+    
+    sources = list(zip(df['filepath'], df['imageLabel']))
     return sources
 
 def preprocessImage(image, pixels):
