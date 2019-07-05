@@ -32,14 +32,13 @@ def prepareDataset(dataDir):
             metadata['imageName'].append(newFileName)
             saveCropImage(os.path.join(annDir[:-4],'img',ann[:-5]), newFileName, i['points']['exterior'])
     metadata['split'] = splitDataset(len(metadata['imageLabel']))
-    metadata = pd.DataFrame(metadata)
-    metadata.to_csv('metadata.csv', index=False)
+    metadataPd = pd.DataFrame(metadata)
     metadata1 = []
     for values in label.items():
-        metadata1.append(metadata.query("split == 'train' & imageLabel == " + "'" + str(values)+"'").iloc[0])
+        metadata1.append(metadataPd.query("split == 'train' & imageLabel == " + "'" + str(values)+"'").iloc[0])
         
     pd.DataFrame(metadata1).to_csv('metadata1.csv', index = False)
-
+    metadataPd.to_csv('metadata.csv', index=False)
 
 def saveCropImage(filePath, newName, exterior):
     img = cv2.imread(filePath)
