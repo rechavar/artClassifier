@@ -7,6 +7,8 @@ import pandas as pd
 from collections import defaultdict
 import cv2
 import tensorflow as tf
+import matplotlib as plt
+
 
 label = ['Escultura', 'Mural', 'fotografia', 'pintura', 'dibujo'] 
 
@@ -44,7 +46,7 @@ def prepareDataset(dataDir):
 def saveCropImage(filePath, newName, exterior):
     img = cv2.imread(filePath)
     img2 = img[int(exterior[1][0]):int(exterior[0][0]), int(exterior[1][1]):int(exterior[1][0])]
-    cv2.imwrite(os.path.join('image file',newName),img2)
+    cv2.imwrite(os.path.join('image_files',newName),img2)
 
 def splitDataset(ds_len):
     test =  int(ds_len * 0.2)
