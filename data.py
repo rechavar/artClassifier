@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from collections import defaultdict
 import cv2
-
+import tensorflow as tf
 
 label = ['Escultura', 'Mural', 'fotografia', 'pintura', 'dibujo'] 
 
@@ -35,7 +35,7 @@ def prepareDataset(dataDir):
     metadataPd = pd.DataFrame(metadata)
     metadata1 = []
     
-    for values in label.items():
+    for values in label:
         metadata1.append(metadataPd.query("split == 'train' & imageLabel == " + "'" + str(values)+"'").iloc[0])
         
     pd.DataFrame(metadata1).to_csv('metadata1.csv', index = False)
@@ -65,18 +65,18 @@ def buildSources(metadata, dataDir, mode = 'train', excludeLabel = None):
         excludeLabel = set(excludeLabel)
     
     df = metadata[metadata['split'] == mode]
-    df['filepath'] = metadata['imageName'].apply(lambda x: os.path.join(dataDir.x))
-    includeMask = metadata['label'].apply(lambda x: c not in excludeLabel)
+    df['filepath'] = metadata['imageName'].apply(lambda x: os.path.join(dataDir,x))
+    includeMask = metadata['imageLabel'].apply(lambda x: x not in excludeLabel)
     df = df[includeMask]
 
-    sources = list(zip(df['filepath'],df['label']))
+    sources = list(zip(df['filepath'],metadata['imageLabel']))
     return sources
 
 
 def preprocessImage(image,pixels):
     return  (tf.image.resize(image, size=(pixels,pixels)))/255.0
 
-def make_dataset(sources, training=False, batch_size=1,
+def makeDataset(sources, training=False, batch_size=1,
     num_epochs=1, num_parallel_calls=1, shuffle_buffer_size=None, pixels = 32, target = 1):
     """
     Returns an operation to iterate over the dataset specified in sources
@@ -98,7 +98,7 @@ def make_dataset(sources, training=False, batch_size=1,
     """
     def load(row):
         filepath = row['image']
-        img = io.decode_jpeg(io.read_file(filepath))
+        img = tf.io.decode_jpeg(tf.io.read_file(filepath))
         return img, row['label']
     
     if shuffle_buffer_size is None:
@@ -114,11 +114,11 @@ def make_dataset(sources, training=False, batch_size=1,
     if training:
         ds = ds.shuffle(shuffle_buffer_size)
 
-    ds = map(load,num_parallel_calls = num_parallel_calls)
-    ds = map(lambda x,y: (preprocessImage(x,pixels), y))
+    ds = ds.map(load,num_parallel_calls=num_parallel_calls)
+    ds = ds.map(lambda x,y: (preprocessImage(x,pixels), y))
     
     if training:
-        ds = ds.map(lambda x,y: augmentImage(x),y)
+        ds = ds.map(lambda x, y: (augmentImage(x), y))
     
     ds = ds.map(lambda x, y: (x, tuple([y]*target) if target > 1 else y))
     ds = ds.repeat(count=num_epochs)
