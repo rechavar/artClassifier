@@ -34,7 +34,7 @@ def prepareDataset(dataDir):
             try:
                 metadata['imageLabel'].append(labels[i['tags'][0]['name']])
             except:
-                print(ann)
+                #print(ann)
                 break
             metadata['imageName'].append(newFileName)
 
@@ -50,7 +50,7 @@ def prepareDataset(dataDir):
     pd.DataFrame(metadata1).to_csv('metadata1.csv', index=False)
 
 def saveCropImage(filePath, newName, exterior):
-    print(filePath)
+    #print(filePath)
     img = cv2.imread(filePath)
     img2 = img[int(exterior[0][1]):int(exterior[1][1]), int(exterior[0][0]):int(exterior[1][0])]
     cv2.imwrite(os.path.join('image_files', newName), img2)
@@ -128,7 +128,8 @@ def makeDataset(sources, training=False, batch_size=1,
     
     if training:
         ds = ds.map(lambda x,y: (augmentImage(x), y))
-        
+    
+    ds = ds.map(lambda x, y: (x, tuple([y]*target) if target > 1 else y)) 
     ds = ds.repeat(count=num_epochs)
     ds = ds.batch(batch_size=batch_size)
     ds = ds.prefetch(1)
