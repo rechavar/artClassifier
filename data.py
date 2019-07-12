@@ -87,7 +87,7 @@ def preprocessImage(image, pixels):
     return image
 
 def makeDataset(sources, training=False, batch_size=1,
-    num_epochs=1, num_parallel_calls=1, shuffle_buffer_size=None, pixels = 32):
+    num_epochs=1, num_parallel_calls=1, shuffle_buffer_size=None, pixels = 32, target = 1):
     """
     Returns an operation to iterate over the dataset specified in sources
     Args:
