@@ -11,7 +11,11 @@ import pandas as pd
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
-labels = ['Escultura', 'Mural', 'fotografia', 'pintura', 'dibujo'] 
+labels = {'Escultura': 0,
+          'Mural': 1,
+          'fotografia': 2,
+          'pintura': 3,
+          'dibujo': 4} 
 
 def prepareDataset(dataDir):
     if not os.path.exists('image_files'):
@@ -28,7 +32,7 @@ def prepareDataset(dataDir):
         for i in dataStore['objects']:
             newFileName = fn(ann)
             try:
-                metadata['imageLabel'].append(i['tags'][0]['name'])
+                metadata['imageLabel'].append(labels[i['tags'][0]['name']])
             except:
                 print(ann)
                 break
@@ -40,8 +44,8 @@ def prepareDataset(dataDir):
     pd.DataFrame(metadata).to_csv('metadata.csv', index=False)
     metadata = pd.DataFrame(metadata)
     metadata1 = []
-    for value in labels:
-        metadata1.append(metadata.query("split == 'train' & imageLabel == " +"'"+ str(value)+"'").iloc[0]) 
+    for _, value in labels.items():
+        metadata1.append(metadata.query("split == 'train' & imageLabel == " + str(value)).iloc[0]) 
 
     pd.DataFrame(metadata1).to_csv('metadata1.csv', index=False)
 
