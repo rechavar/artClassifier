@@ -49,10 +49,6 @@ def getAlexnetModel(numClass):
             filters= 256, kernel_size = (3,3), activation = 'relu',
             strides = (1,1), padding = 'valid'
             ),
-        layers.Conv2D(
-            filters= 384, kernel_size = (3,3), activation = 'relu',
-            strides = (1,1), padding = 'valid'
-            ),
         layers.AveragePooling2D(pool_size = (2,2), strides=(2,2), padding = 'valid'),
         layers.Flatten(),
         layers.Dense(4096, activation = 'relu'),
@@ -70,7 +66,11 @@ def getVGGModel(numClass):
     model = tf.Sequential([
         layers.Conv2D(
             filters = 64, kernel_size = (3,3), activation = 'relu',
-            padding = 'same', input_shape = (244,244,3)
+            padding = 'same', input_shape = (224,224,3)
+        ),
+        layers.Conv2D(
+            filters = 64, kernel_size = (3,3), activation = 'relu',
+            padding = 'same'
         ),
         layers.MaxPooling2D(pool_size = (2,2), strides = (2,2)),
         layers.Conv2D(
@@ -82,6 +82,10 @@ def getVGGModel(numClass):
             padding = 'same' 
         ),
         layers.AveragePooling2D(pool_size = (2,2), strides = (2,2)),
+        layers.Conv2D(
+            filters = 256, kernel_size = (3,3), activation = 'relu',
+            padding = 'same'
+        ),
         layers.Conv2D(
             filters = 256, kernel_size = (3,3), activation = 'relu',
             padding = 'same'
@@ -100,10 +104,21 @@ def getVGGModel(numClass):
             padding = 'same'
         ),
         layers.AveragePooling2D(pool_size = (2,2), strides = (2,2)),
+        layers.Conv2D(
+            filters = 512, kernel_size = (3,3), activation = 'relu',
+            padding = 'same'
+        ),
+        layers.Conv2D(
+            filters = 512, kernel_size = (3,3), activation = 'relu',
+            padding = 'same'
+        ),
+        layers.Conv2D(
+            filters = 512, kernel_size = (3,3), activation = 'relu',
+            padding = 'same'
+        ),
+        layers.AveragePooling2D(pool_size = (2,2), strides = (2,2)),
         layers.Flatten(),
         layers.Dense(4096, activation = 'relu'),
         layers.Dense(4096, activation = 'relu'),
-        layers.Dense(numClass, activation = 'softmax')
-
-    ])
+        layers.Dense(numClass, activation = 'softmax')])
     return model 

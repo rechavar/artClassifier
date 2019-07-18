@@ -3,14 +3,14 @@ import sys
 import json 
 import random
 import numpy as np
-import pandas as pd
-from collections import defaultdict
+import pandas as pd 
 import cv2
-import tensorflow as tf
-import matplotlib as plt
+import tensorflow as tf 
+import matplotlib.pyplot as plt
 
 
-label = ['Escultura', 'Mural', 'fotografia', 'pintura', 'dibujo'] 
+label = ['Escultura', 'Mural', 'fotografia', 'pintura', 'dibujo']
+labeldic = {'Escultura' : 0, 'Mural' : 1, 'fotografia': 2, 'pintura' : 3, 'dibujo' :4} 
 
 def prepareDataset(dataDir):
     if not os.path.exists('image_files'):
@@ -27,7 +27,8 @@ def prepareDataset(dataDir):
             newFileName = fn(ann)
 
             try:
-                metadata['imageLabel'].append(i['tags'][0]['name'])
+                key = i['tags'][0]['name']
+                metadata['imageLabel'].append(labeldic[key])
             except:
                 print(ann)
                 break
@@ -37,15 +38,15 @@ def prepareDataset(dataDir):
     metadataPd = pd.DataFrame(metadata)
     metadata1 = []
     
-    for values in label:
-        metadata1.append(metadataPd.query("split == 'train' & imageLabel == " + "'" + str(values)+"'").iloc[0])
+    for key in labeldic:
+        metadata1.append(metadataPd.query("split == 'train' & imageLabel == " + "'" + str(labeldic[key]) +"'").iloc[0])
         
     pd.DataFrame(metadata1).to_csv('metadata1.csv', index = False)
     metadataPd.to_csv('metadata.csv', index=False)
 
 def saveCropImage(filePath, newName, exterior):
     img = cv2.imread(filePath)
-    img2 = img[int(exterior[1][0]):int(exterior[0][0]), int(exterior[1][1]):int(exterior[1][0])]
+    img2 = img[int(exterior[0][1]):int(exterior[1][1]), int(exterior[0][0]):int(exterior[1][0])]
     cv2.imwrite(os.path.join('image_files',newName),img2)
 
 def splitDataset(ds_len):
@@ -66,12 +67,13 @@ def buildSources(metadata, dataDir, mode = 'train', excludeLabel = None):
     elif isinstance(excludeLabel,(list,tuple)):
         excludeLabel = set(excludeLabel)
     
-    df = metadata[metadata['split'] == mode]
-    df['filepath'] = metadata['imageName'].apply(lambda x: os.path.join(dataDir,x))
-    includeMask = metadata['imageLabel'].apply(lambda x: x not in excludeLabel)
+    df = metadata.copy()
+    df = df[df['split'] == mode]
+    df['filepath'] = df['imageName'].apply(lambda x: os.path.join(dataDir, x))
+    includeMask = df['imageLabel'].apply(lambda x: x not in excludeLabel)
     df = df[includeMask]
-
-    sources = list(zip(df['filepath'],metadata['imageLabel']))
+    
+    sources = list(zip(df['filepath'], df['imageLabel']))
     return sources
 
 
@@ -123,8 +125,8 @@ def makeDataset(sources, training=False, batch_size=1,
         ds = ds.map(lambda x, y: (augmentImage(x), y))
     
     ds = ds.map(lambda x, y: (x, tuple([y]*target) if target > 1 else y))
-    ds = ds.repeat(count=num_epochs)
     ds = ds.batch(batch_size=batch_size)
+    ds = ds.repeat(count=num_epochs)
     ds = ds.prefetch(1)
 
     return ds
@@ -142,24 +144,23 @@ def imshowThree(batch):
     
 def augmentImage(img):
     return img
-def drawResults(H,N,name, val = False):
+def drawResults(H,N, val = False):
     fig,axis = plt.subplots(2)
     fig.suptitle('Training loss and accuracy on Dataset')
-    axis[0].plot(np.range(0,N),H.history["Loss"],label = "trainLoss")
+    axis[0].plot(range(0,N),H.history["loss"],label = "trainLoss")
 
     if val:
-        axis[0].plot(np.arange(0,N),H.history["valLoss"],label = "valLoss")
-    axs[0].set_xlabel("Epoch #")
-    axs[0].set_ylabel("Loss")
-    axs[0].legend(loc="lower left")
-    axs[1].plot(np.arange(0, N), H.history["accuracy"], label="train_acc")
+        axis[0].plot(np.arange(0,N),H.history["val_loss"],label = "valLoss")
+    axis[0].set_xlabel("Epoch #")
+    axis[0].set_ylabel("Loss")
+    axis[0].legend(loc="lower left")
+    axis[1].plot(np.arange(0, N), H.history["acc"], label="train_acc")
 
     if(val):
-        axs[1].plot(np.arange(0, N), H.history["val_accuracy"], label="val_acc")
-    axs[1].set_xlabel("Epoch #")
-    axs[1].set_ylabel("Accuracy")
-    axs[1].legend(loc="lower left")
-    plt.savefig(name + ".png")
+        axis[1].plot(np.arange(0, N), H.history["val_acc"], label="val_acc")
+    axis[1].set_xlabel("Epoch #")
+    axis[1].set_ylabel("Accuracy")
+    axis[1].legend(loc="lower left")
 
 if __name__ == '__main__':
     import argparse
