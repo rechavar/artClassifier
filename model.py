@@ -135,7 +135,7 @@ def inception_block(x,one_size, three_size, five_size):
     return out
 
 def getGoogleNet(numClass):
-    inputs = keras.input(shape=(224,224,3), name = 'img')
+    inputs = tf.keras.input(shape=(224,224,3), name = 'img')
     x = tf.keras.layers.Conv2D(filters = 64, kernel_size = (7,7), padding = 'SAME',
                             activation = 'relu')(inputs)
     x = tf.keras.layers.MaxPooling2D(pool_size = (3,3), strides=(2,2), padding = 'valid')(x)
@@ -160,9 +160,58 @@ def getGoogleNet(numClass):
 
     x = tf.keras.layers.Dropout(0.4)(x)
     x = tf.keras.layers.Dense(1000, activation = 'relu')(x)
-    x = tf.keras.layers.Dense(9, activation = 'softmax')(x)
+    x = tf.keras.layers.Dense(numClass, activation = 'softmax')(x)
 
     out= tf.keras.Model(input_layer, x, name='inception_v1')
 
     return out
 
+def resNetBlock(x, filtters):
+    x = tf.keras.layers.Conv2D(filters = filtters,kernel_size = (3,3),padding = 'same', activation = 'relu')(x)
+    out = tf.keras.layers.Conv2D(filters = filtters,kernel_size = (3,3),padding = 'same', activation = 'relu')(x)   
+    return out
+
+
+def resNetModel(numClass):
+    inputs = tf.keras.input(shape=(224,224,3), name = 'img')
+    x = tf.keras.layers.MaxPooling2D(pool_size = (3,3), strides = (1,1), padding = 'valid')(inputs)
+
+    xb = resNetBlock(x,64)
+    x1 = tf.keras.layers.Concatenate()([x, xb])
+    xb = resNetBlock(x1,64)
+    x1 = tf.keras.layers.Concatenate()([x1, xb])
+    xb = resNetBlock(x1,64)
+    x1 = tf.keras.layers.Concatenate()([x1, xb])
+
+    xb = resNetBlock(x1,128)
+    x1 = tf.keras.layers.Concatenate()([x1, xb])
+    xb = resNetBlock(x1,128)
+    x1 = tf.keras.layers.Concatenate()([x1, xb])
+    xb = resNetBlock(x1,128)
+    x1 = tf.keras.layers.Concatenate()([x1, xb])
+    xb = resNetBlock(x1,128)
+    x1 = tf.keras.layers.Concatenate()([x1, xb])
+
+    xb = resNetBlock(x1,256)
+    x1 = tf.keras.layers.Concatenate()([x1, xb])
+    xb = resNetBlock(x1,256)
+    x1 = tf.keras.layers.Concatenate()([x1, xb])
+    xb = resNetBlock(x1,256)
+    x1 = tf.keras.layers.Concatenate()([x1, xb])
+    xb = resNetBlock(x1,256)
+    x1 = tf.keras.layers.Concatenate()([x1, xb])
+    xb = resNetBlock(x1,256)
+    x1 = tf.keras.layers.Concatenate()([x1, xb])
+    xb = resNetBlock(x1,256)
+    x1 = tf.keras.layers.Concatenate()([x1, xb])
+    
+    xb = resNetBlock(x1,512)
+    x1 = tf.keras.layers.Concatenate()([x1, xb])
+    xb = resNetBlock(x1,512)
+    x1 = tf.keras.layers.Concatenate()([x1, xb])
+    xb = resNetBlock(x1,512)
+    x1 = tf.keras.layers.Concatenate()([x1, xb])
+
+
+    xavg = tf.keras.layers.AveragePooling2D(pool_size = (3,3), strides = (1,1), padding = 'valid')(x1)
+    x = tf.keras.layers.Dense(numClass, activation = 'softmax')(xavg)
