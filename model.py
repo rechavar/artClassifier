@@ -122,3 +122,47 @@ def getVGGModel(numClass):
         layers.Dense(4096, activation = 'relu'),
         layers.Dense(numClass, activation = 'softmax')])
     return model 
+
+def inception_block(x,one_size, three_size, five_size):
+    x1 = tf.keras.layers.Conv2d(filters=one_size, kernel_size=(1,1), padding='SAME', activation = 'relu')(x)
+    x2 = tf.keras.layers.Conv2d(filters=one_size, kernel_size=(1,1), padding='SAME', activation = 'relu')(x)
+    x3 = tf.keras.layers.Conv2d(filters=one_size, kernel_size=(1,1), padding='SAME', activation = 'relu')(x)
+    x4 = tf.keras.layers.MaxPooling2D(pool_size = (3,3), strides=(2,2), padding = 'valid')(x)
+    x5 = tf.keras.layers.Conv2d(filters=three_size, kernel_size=(3,3), padding='SAME', activation = 'relu')(x2)
+    x6 = tf.keras.layers.Conv2d(filters=five_size, kernel_size=(5,5), padding='SAME', activation = 'relu')(x3)
+    x7 = tf.keras.layers.Conv2d(filters=one_size, kernel_size=(1,1), padding='SAME', activation = 'relu')(x4)
+    out = tf.keras.layers.Concatenate()([x7, x6, x5, x1])
+    return out
+
+def getGoogleNet(numClass):
+    inputs = keras.input(shape=(224,224,3), name = 'img')
+    x = tf.keras.layers.Conv2D(filters = 64, kernel_size = (7,7), padding = 'SAME',
+                            activation = 'relu')(inputs)
+    x = tf.keras.layers.MaxPooling2D(pool_size = (3,3), strides=(2,2), padding = 'valid')(x)
+    x = tf.keras.layers.Conv2D(filters = 64, kernel_size = (7,7), padding = 'SAME',
+                            activation = 'relu', strides = (1,1))(inputs)
+    x = tf.keras.layers.MaxPooling2D(pool_size = (3,3), strides=(2,2), padding = 'valid')(x)
+
+    x = inception_block(x,64,96,16)
+    x = inception_block(x,128,128,32)
+    x = tf.keras.layers.MaxPooling2D(pool_size = (3,3), strides=(2,2), padding = 'valid')(x)
+
+    x = inception_block(x,192,96,16)
+    x = inception_block(x,160,112,24)
+    x = inception_block(x,128,128,24)
+    x = inception_block(x,112,144,32)
+    x = inception_block(x,256,160,32)
+    x = tf.keras.layers.MaxPooling2D(pool_size = (3,3), strides=(2,2), padding = 'valid')(x)
+
+    x = inception_block(x,256,160,32)
+    x = inception_block(x,384,192,48)
+    x = tf.keras.layers.AveragePooling2D(pool_size = (7,7), strides=(1,1), padding = 'valid')(x)
+
+    x = tf.keras.layers.Dropout(0.4)(x)
+    x = tf.keras.layers.Dense(1000, activation = 'relu')(x)
+    x = tf.keras.layers.Dense(9, activation = 'softmax')(x)
+
+    out= tf.keras.Model(input_layer, x, name='inception_v1')
+
+    return out
+
