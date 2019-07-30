@@ -124,18 +124,18 @@ def getVGGModel(numClass):
     return model 
 
 def inception_block(x,one_size, three_size, five_size):
-    x1 = tf.layers.Conv2d(filters=one_size, kernel_size=(1,1), padding='SAME', activation = 'relu')(x)
-    x2 = tf.layers.Conv2d(filters=one_size, kernel_size=(1,1), padding='SAME', activation = 'relu')(x)
-    x3 = tf.layers.Conv2d(filters=one_size, kernel_size=(1,1), padding='SAME', activation = 'relu')(x)
+    x1 = tf.layers.Conv2D(filters=one_size, kernel_size=(1,1), padding='SAME', activation = 'relu')(x)
+    x2 = tf.layers.Conv2D(filters=one_size, kernel_size=(1,1), padding='SAME', activation = 'relu')(x)
+    x3 = tf.layers.Conv2D(filters=one_size, kernel_size=(1,1), padding='SAME', activation = 'relu')(x)
     x4 = tf.layers.MaxPooling2D(pool_size = (3,3), strides=(2,2), padding = 'valid')(x)
-    x5 = tf.layers.Conv2d(filters=three_size, kernel_size=(3,3), padding='SAME', activation = 'relu')(x2)
-    x6 = tf.layers.Conv2d(filters=five_size, kernel_size=(5,5), padding='SAME', activation = 'relu')(x3)
-    x7 = tf.layers.Conv2d(filters=one_size, kernel_size=(1,1), padding='SAME', activation = 'relu')(x4)
+    x5 = tf.layers.Conv2D(filters=three_size, kernel_size=(3,3), padding='SAME', activation = 'relu')(x2)
+    x6 = tf.layers.Conv2D(filters=five_size, kernel_size=(5,5), padding='SAME', activation = 'relu')(x3)
+    x7 = tf.layers.Conv2D(filters=one_size, kernel_size=(1,1), padding='SAME', activation = 'relu')(x4)
     out = tf.layers.Concatenate()([x7, x6, x5, x1])
     return out
 
 def getGoogleNet(numClass):
-    inputs = tf.input(shape=(224,224,3), name = 'img')
+    inputs = tf.Input(shape=(224,224,3), name = 'img')
     x = tf.layers.Conv2D(filters = 64, kernel_size = (7,7), padding = 'SAME',
                             activation = 'relu')(inputs)
     x = tf.layers.MaxPooling2D(pool_size = (3,3), strides=(2,2), padding = 'valid')(x)
