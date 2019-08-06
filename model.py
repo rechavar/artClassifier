@@ -168,8 +168,8 @@ def getGoogleNet(numClass):
     x = inception_block(x,384,192,48,384,128,128)
     x = tf.layers.AveragePooling2D(pool_size = (7,7), strides=(1,1), padding = 'valid')(x)
 
+    x = tf.layers.Flatten()(x)
     x = tf.layers.Dropout(0.4)(x)
-    x = tf.layers.Faltten()(x)
     x = tf.layers.Dense(1000, activation = 'relu')(x)
     x = tf.layers.Dense(numClass, activation = 'softmax')(x)
 
